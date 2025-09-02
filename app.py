@@ -1,0 +1,881 @@
+# app.py
+import streamlit as st
+import streamlit.components.v1 as components
+
+st.set_page_config(page_title="Ex Chat Simulator", layout="wide")
+
+html_code = """
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Coding Instructor AI</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: "#7e6fff",
+                dark: "#6a5af9",
+              },
+              secondary: "#00d4ff",
+              dark: {
+                bg: "#121826",
+                card: "#1e293b",
+                border: "#2d3749",
+                code: "#0f172a",
+              },
+              text: {
+                primary: "#e2e8f0",
+                secondary: "#94a3b8",
+              },
+              success: "#10b981",
+              warning: "#f59e0b",
+              danger: "#ef4444",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["Fira Code", "monospace"],
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
+              'slide-in': 'slide-in 0.3s ease-out',
+              'fade-in': 'fade-in 0.5s ease-out',
+              'gradient': 'gradient 15s ease infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              'pulse-soft': {
+                '0%, 100%': { opacity: 1 },
+                '50%': { opacity: 0.7 },
+              },
+              'slide-in': {
+                '0%': { transform: 'translateY(10px)', opacity: 0 },
+                '100%': { transform: 'translateY(0)', opacity: 1 },
+              },
+              'fade-in': {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 },
+              },
+              gradient: {
+                '0%, 100%': {
+                  'background-size': '200% 200%',
+                  'background-position': 'left center'
+                },
+                '50%': {
+                  'background-size': '200% 200%',
+                  'background-position': 'right center'
+                }
+              }
+            }
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap');
+      
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      
+      .gradient-text {
+        background: linear-gradient(to right, #7e6fff, #00d4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* Custom scrollbar */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #7e6fff;
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #6a5af9;
+      }
+
+      /* Animation for the typing indicator */
+      @keyframes typing {
+        0% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.3;
+        }
+      }
+
+      .typing-dot {
+        animation: typing 1.5s infinite;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+
+      /* Mobile sidebar styles */
+      @media (max-width: 1023px) {
+        #sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.3s ease-in-out;
+        }
+
+        #sidebar.active {
+          transform: translateX(0);
+        }
+      }
+      
+      /* Glow effect */
+      .glow {
+        box-shadow: 0 0 20px rgba(126, 111, 255, 0.3);
+      }
+      
+      /* Interactive card hover effect */
+      .interactive-card {
+        transition: all 0.3s ease;
+      }
+      
+      .interactive-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      }
+      
+      /* Button press effect */
+      .btn-press:active {
+        transform: scale(0.95);
+      }
+      
+      /* Animated background */
+      .animated-bg {
+        background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #1e293b);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+      }
+      
+      /* Floating elements */
+      .floating-element {
+        animation: float 6s ease-in-out infinite;
+      }
+      
+      /* Code block styling */
+      pre code {
+        border-radius: 0.5rem;
+        padding: 1rem;
+      }
+      
+      /* Particle effects */
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+      }
+      
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #7e6fff, #00d4ff);
+        opacity: 0.3;
+        animation: float 8s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col lg:flex-row animated-bg text-text-primary">
+    <!-- Particle background -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Mobile menu button -->
+    <button
+      id="mobileMenuButton"
+      class="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-dark-card border border-dark-border text-text-primary btn-press transition-all duration-200 hover:glow"
+    >
+      <i class="fas fa-bars text-xl"></i>
+    </button>
+
+    <!-- Sidebar Backdrop (for mobile) -->
+    <div
+      id="sidebarBackdrop"
+      class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"
+    ></div>
+
+    <!-- Sidebar -->
+    <div
+      id="sidebar"
+      class="lg:w-64 bg-[#0c1120] border-r border-dark-border flex flex-col flex-shrink-0 fixed lg:relative h-full z-30 backdrop-blur-md bg-opacity-90"
+    >
+      <div class="p-5 border-b border-dark-border mb-5">
+        <div class="flex items-center space-x-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center floating-element"
+          >
+            <i class="fas fa-robot text-white"></i>
+          </div>
+          <h1 class="text-xl font-bold gradient-text">Code Mentor AI</h1>
+        </div>
+      </div>
+
+      <div class="flex-1 px-3">
+        <nav class="space-y-1">
+          <a
+            href="#"
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-primary/10 text-primary transition-all duration-200 hover:bg-primary/20 group interactive-card"
+          >
+            <i class="fas fa-home w-5 text-center"></i>
+            <span class="flex-1">Dashboard</span>
+            <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a
+            href="#"
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl text-text-secondary transition-all duration-200 hover:bg-white/5 hover:text-text-primary group interactive-card"
+          >
+            <i class="fas fa-history w-5 text-center"></i>
+            <span class="flex-1">History</span>
+            <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a
+            href="#"
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl text-text-secondary transition-all duration-200 hover:bg-white/5 hover:text-text-primary group interactive-card"
+          >
+            <i class="fas fa-book w-5 text-center"></i>
+            <span class="flex-1">Tutorials</span>
+            <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a
+            href="#"
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl text-text-secondary transition-all duration-200 hover:bg-white/5 hover:text-text-primary group interactive-card"
+          >
+            <i class="fas fa-code w-5 text-center"></i>
+            <span class="flex-1">Playground</span>
+            <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a
+            href="#"
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl text-text-secondary transition-all duration-200 hover:bg-white/5 hover:text-text-primary group interactive-card"
+          >
+            <i class="fas fa-cog w-5 text-center"></i>
+            <span class="flex-1">Settings</span>
+            <i class="fas fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-5 border-t border-dark-border text-text-secondary text-sm">
+        <p>Code Mentor AI v2.0</p>
+        <p>Powered by Gemini API</p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col min-h-screen lg:ml-0">
+      <!-- Header -->
+      <header
+        class="bg-dark-card/30 border-b border-dark-border p-5 flex items-center justify-between backdrop-blur-md"
+      >
+        <div class="flex items-center lg:hidden">
+          <h1 class="text-2xl font-bold gradient-text ml-12">
+            Coding Instructor AI
+          </h1>
+        </div>
+        <div class="hidden lg:block">
+          <h1 class="text-2xl font-bold gradient-text">Coding Instructor AI</h1>
+        </div>
+
+        <div class="flex space-x-3">
+          <button
+            id="themeToggle"
+            class="px-4 py-2 rounded-lg bg-dark-card border border-dark-border text-text-primary flex items-center space-x-2 transition-all duration-200 hover:border-primary/50 hover:bg-primary/10 btn-press"
+          >
+            <i class="fas fa-moon"></i>
+            <span class="hidden lg:inline">Dark Mode</span>
+          </button>
+          <button
+            class="px-4 py-2 rounded-lg bg-dark-card border border-dark-border text-text-primary flex items-center space-x-2 transition-all duration-200 hover:border-primary/50 hover:bg-primary/10 btn-press"
+          >
+            <i class="fas fa-user"></i>
+            <span class="hidden lg:inline">Profile</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="flex-1 overflow-y-auto custom-scrollbar p-5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <!-- Stats Card -->
+          <div
+            class="bg-dark-card/70 border border-dark-border rounded-2xl p-6 shadow-lg interactive-card backdrop-blur-md"
+          >
+            <div class="grid grid-cols-2 gap-5">
+              <div
+                class="bg-dark-bg/40 border border-dark-border rounded-xl p-5 text-center transition-all duration-300 hover:border-primary/50 hover:-translate-y-1 interactive-card"
+              >
+                <i class="fas fa-code-branch text-3xl text-primary mb-3"></i>
+                <div class="text-4xl font-bold gradient-text" id="questionsCount">0</div>
+                <div class="text-text-secondary mt-1">Questions Solved</div>
+              </div>
+              <div
+                class="bg-dark-bg/40 border border-dark-border rounded-xl p-5 text-center transition-all duration-300 hover:border-secondary/50 hover:-translate-y-1 interactive-card"
+              >
+                <i class="fas fa-language text-3xl text-secondary mb-3"></i>
+                <div class="text-4xl font-bold gradient-text" id="languagesCount">0</div>
+                <div class="text-text-secondary mt-1">Languages</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Popular Topics -->
+          <div
+            class="bg-dark-card/70 border border-dark-border rounded-2xl overflow-hidden shadow-lg interactive-card backdrop-blur-md"
+          >
+            <div
+              class="border-b border-dark-border px-6 py-4 flex items-center space-x-2"
+            >
+              <i class="fas fa-fire text-yellow-500 animate-pulse-soft"></i>
+              <h2 class="text-lg font-semibold">Popular Topics</h2>
+            </div>
+            <div class="p-6">
+              <ul class="space-y-3">
+                <li
+                  class="flex items-center transition-all duration-200 hover:text-primary hover:translate-x-1 cursor-pointer topic-item"
+                >
+                  <i class="fas fa-chevron-right text-primary mr-3 text-xs"></i>
+                  JavaScript Closures
+                </li>
+                <li
+                  class="flex items-center transition-all duration-200 hover:text-primary hover:translate-x-1 cursor-pointer topic-item"
+                >
+                  <i class="fas fa-chevron-right text-primary mr-3 text-xs"></i>
+                  Python Decorators
+                </li>
+                <li
+                  class="flex items-center transition-all duration-200 hover:text-primary hover:translate-x-1 cursor-pointer topic-item"
+                >
+                  <i class="fas fa-chevron-right text-primary mr-3 text-xs"></i>
+                  React Hooks
+                </li>
+                <li
+                  class="flex items-center transition-all duration-200 hover:text-primary hover:translate-x-1 cursor-pointer topic-item"
+                >
+                  <i class="fas fa-chevron-right text-primary mr-3 text-xs"></i>
+                  Recursion Patterns
+                </li>
+                <li
+                  class="flex items-center transition-all duration-200 hover:text-primary hover:translate-x-1 cursor-pointer topic-item"
+                >
+                  <i class="fas fa-chevron-right text-primary mr-3 text-xs"></i>
+                  Async/Await
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Section -->
+        <div
+          class="bg-dark-card/70 border border-dark-border rounded-2xl overflow-hidden shadow-lg mb-6 interactive-card backdrop-blur-md"
+        >
+          <div
+            class="border-b border-dark-border px-6 py-4 flex items-center space-x-2"
+          >
+            <i class="fas fa-question-circle text-secondary"></i>
+            <h2 class="text-lg font-semibold">Ask a Coding Question</h2>
+          </div>
+          <div class="p-6">
+            <div
+              class="bg-dark-bg/40 border-l-4 border-primary rounded-xl p-4 mb-6 flex space-x-4 animate-fade-in"
+            >
+              <i class="fas fa-info-circle text-primary text-xl mt-1"></i>
+              <div>
+                <p class="font-medium mb-2">
+                  <strong>How to use:</strong> Ask any coding-related question
+                  in any programming language. The AI is specialized to help
+                  with coding problems and concepts.
+                </p>
+                <p class="text-text-secondary">
+                  For non-coding questions, responses may be unpredictable!
+                </p>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <label
+                class="block text-lg font-semibold mb-3 flex items-center space-x-2"
+              >
+                <i class="fas fa-terminal text-primary"></i>
+                <span>Your Coding Question</span>
+              </label>
+              <textarea
+                id="questionInput"
+                class="w-full bg-dark-bg/30 border border-dark-border rounded-xl p-4 text-text-primary font-mono focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                rows="5"
+                placeholder="e.g., Explain closures in JavaScript, How to implement binary search in Python, What is recursion?"
+              ></textarea>
+              <div class="flex justify-between items-center mt-2 text-text-secondary text-sm">
+                <div id="charCount">0 characters</div>
+                <div id="suggestionCount" class="hidden">
+                  <i class="fas fa-lightbulb text-warning mr-1"></i>
+                  <span>Suggestions available</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              id="askButton"
+              class="w-full bg-gradient-to-r from-primary to-primary-dark text-white font-semibold py-4 rounded-xl flex items-center justify-center space-x-2 transition-all duration-300 hover:shadow-lg hover:from-primary-dark hover:to-primary-dark hover:-translate-y-0.5 btn-press glow"
+            >
+              <i class="fas fa-paper-plane"></i>
+              <span>Ask Coding Instructor</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Output Section -->
+        <div
+          class="bg-dark-card/70 border border-dark-border rounded-2xl overflow-hidden shadow-lg interactive-card backdrop-blur-md"
+        >
+          <div
+            class="border-b border-dark-border px-6 py-4 flex items-center space-x-2"
+          >
+            <i class="fas fa-graduation-cap text-green-500"></i>
+            <h2 class="text-lg font-semibold">Instructor's Response</h2>
+            <button id="copyResponse" class="ml-auto text-text-secondary hover:text-text-primary transition-colors">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <div class="p-6">
+            <div id="loadingIndicator" class="hidden text-center py-8">
+              <div
+                class="inline-flex items-center justify-center space-x-2 mb-4"
+              >
+                <div class="typing-dot w-3 h-3 bg-primary rounded-full"></div>
+                <div class="typing-dot w-3 h-3 bg-primary rounded-full"></div>
+                <div class="typing-dot w-3 h-3 bg-primary rounded-full"></div>
+              </div>
+              <p class="text-text-secondary">
+                Analyzing your question and preparing the best explanation...
+              </p>
+            </div>
+
+            <div
+              id="outputArea"
+              class="bg-dark-bg/30 border border-dark-border rounded-xl p-6 custom-scrollbar overflow-y-auto max-h-[400px] font-mono text-sm"
+            >
+              <p class="mb-4">
+                <strong>Welcome to Coding Instructor AI!</strong> I'm here to
+                help you with any programming questions you have.
+              </p>
+              <p class="mb-4">Ask me about:</p>
+              <ul class="list-disc list-inside mb-4 ml-4">
+                <li>Programming concepts (OOP, recursion, closures)</li>
+                <li>Language-specific questions (JavaScript, Python, Java)</li>
+                <li>Algorithm explanations</li>
+                <li>Code debugging</li>
+                <li>Best practices</li>
+              </ul>
+              <p class="mb-2">
+                Try asking:
+                <code class="bg-dark-code text-secondary px-2 py-1 rounded cursor-pointer example-question"
+                  >"Explain how promises work in JavaScript"</code
+                >
+                or
+                <code class="bg-dark-code text-secondary px-2 py-1 rounded cursor-pointer example-question"
+                  >"Show me a Python implementation of quicksort"</code
+                >
+              </p>
+            </div>
+            
+            <div id="responseActions" class="hidden mt-4 flex justify-end space-x-3">
+              <button class="px-4 py-2 rounded-lg bg-dark-card border border-dark-border text-text-primary transition-all duration-200 hover:border-primary/50 hover:bg-primary/10 btn-press">
+                <i class="fas fa-thumbs-up mr-2"></i>Helpful
+              </button>
+              <button class="px-4 py-2 rounded-lg bg-dark-card border border-dark-border text-text-primary transition-all duration-200 hover:border-primary/50 hover:bg-primary/10 btn-press">
+                <i class="fas fa-thumbs-down mr-2"></i>Not Helpful
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // DOM Elements
+      const questionInput = document.getElementById("questionInput");
+      const askButton = document.getElementById("askButton");
+      const outputArea = document.getElementById("outputArea");
+      const loadingIndicator = document.getElementById("loadingIndicator");
+      const sidebar = document.getElementById("sidebar");
+      const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+      const mobileMenuButton = document.getElementById("mobileMenuButton");
+      const themeToggle = document.getElementById("themeToggle");
+      const copyResponse = document.getElementById("copyResponse");
+      const responseActions = document.getElementById("responseActions");
+      const questionsCount = document.getElementById("questionsCount");
+      const languagesCount = document.getElementById("languagesCount");
+      const charCount = document.getElementById("charCount");
+      const suggestionCount = document.getElementById("suggestionCount");
+      const particlesContainer = document.getElementById("particles");
+      
+      // State variables
+      let isDarkMode = true;
+      let questionCountValue = 0;
+      let languagesValue = 0;
+
+      // Create particle background
+      function createParticles() {
+        const particlesCount = 20;
+        
+        for (let i = 0; i < particlesCount; i++) {
+          const particle = document.createElement('div');
+          particle.classList.add('particle');
+          
+          // Random size between 5 and 15px
+          const size = Math.random() * 10 + 5;
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          
+          // Random position
+          particle.style.left = `${Math.random() * 100}%`;
+          particle.style.top = `${Math.random() * 100}%`;
+          
+          // Random animation delay
+          particle.style.animationDelay = `${Math.random() * 5}s`;
+          
+          particlesContainer.appendChild(particle);
+        }
+      }
+      
+      // Initialize animations and counters
+      document.addEventListener('DOMContentLoaded', function() {
+        // Create particle background
+        createParticles();
+        
+        // Animate counter values
+        animateValue(questionsCount, 0, 1248, 2000);
+        animateValue(languagesCount, 0, 24, 2000);
+        
+        // Add animation to cards on page load
+        const cards = document.querySelectorAll('.interactive-card');
+        cards.forEach((card, index) => {
+          card.style.animationDelay = `${index * 0.1}s`;
+          card.classList.add('animate-slide-in');
+        });
+      });
+
+      // Counter animation function
+      function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const value = Math.floor(progress * (end - start) + start);
+          element.innerHTML = value.toLocaleString();
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
+
+      // Toggle sidebar on mobile
+      mobileMenuButton.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+        sidebarBackdrop.classList.toggle("hidden");
+        if (!sidebarBackdrop.classList.contains('hidden')) {
+          setTimeout(() => {
+            sidebarBackdrop.classList.add('opacity-100');
+          }, 10);
+        }
+      });
+
+      sidebarBackdrop.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        sidebarBackdrop.classList.add('opacity-0');
+        setTimeout(() => {
+          sidebarBackdrop.classList.add("hidden");
+        }, 300);
+      });
+
+      // Theme toggle functionality
+      themeToggle.addEventListener('click', () => {
+        isDarkMode = !isDarkMode;
+        const icon = themeToggle.querySelector('i');
+        const text = themeToggle.querySelector('span');
+        
+        if (isDarkMode) {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+          text.textContent = 'Dark Mode';
+          document.body.classList.add('animated-bg');
+        } else {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+          text.textContent = 'Light Mode';
+          document.body.classList.remove('animated-bg');
+          document.body.classList.add('bg-gradient-to-br', 'from-blue-100', 'to-indigo-100');
+        }
+      });
+
+      // Character count for textarea
+      questionInput.addEventListener('input', () => {
+        const length = questionInput.value.length;
+        charCount.textContent = `${length} characters`;
+        
+        // Show suggestion indicator if text is long enough
+        if (length > 20) {
+          suggestionCount.classList.remove('hidden');
+        } else {
+          suggestionCount.classList.add('hidden');
+        }
+      });
+
+      // Copy response functionality
+      copyResponse.addEventListener('click', () => {
+        const textToCopy = outputArea.innerText;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          // Show feedback
+          const originalHTML = copyResponse.innerHTML;
+          copyResponse.innerHTML = '<i class="fas fa-check"></i>';
+          setTimeout(() => {
+            copyResponse.innerHTML = originalHTML;
+          }, 2000);
+        });
+      });
+
+      // Example question click
+      document.querySelectorAll('.example-question').forEach(item => {
+        item.addEventListener('click', () => {
+          questionInput.value = item.textContent.replace(/"/g, '');
+          questionInput.focus();
+          questionInput.dispatchEvent(new Event('input'));
+        });
+      });
+
+      // Popular topic click
+      document.querySelectorAll('.topic-item').forEach(item => {
+        item.addEventListener('click', () => {
+          questionInput.value = `Explain ${item.textContent.trim()}`;
+          questionInput.focus();
+          questionInput.dispatchEvent(new Event('input'));
+        });
+      });
+
+      // API Configuration
+      const GEMINI_API_KEY = "AIzaSyCs0hJotWoWdjhSyDNKKRmD3jRRiMKLZpk";
+      const MODEL_NAME = "gemini-1.5-flash";
+      const systemInstructionText =
+        "You are a Coding Instructor, who answer only to coding related problem. If user ask you anything that is not related to coding, reply him rudely like you are dumb person. But if he/she ask problem related to coding response in a detail manner.";
+
+      // Ask button functionality
+      askButton.addEventListener("click", async () => {
+        const question = questionInput.value.trim();
+
+        if (!question) {
+          outputArea.innerHTML =
+            '<div class="bg-red-500/10 border-l-4 border-red-500 p-4 rounded text-red-500 mb-4 flex items-center space-x-2 animate-slide-in"><i class="fas fa-exclamation-circle"></i><span>Please enter a coding question first!</span></div>';
+          outputArea.scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+
+        // Show loading state
+        outputArea.classList.add("hidden");
+        loadingIndicator.classList.remove("hidden");
+        askButton.disabled = true;
+        askButton.innerHTML =
+          '<i class="fas fa-circle-notch fa-spin"></i><span>Processing...</span>';
+
+        // Increment question count with animation
+        questionCountValue += 1;
+        animateValue(questionsCount, parseInt(questionsCount.textContent.replace(/,/g, '')), questionCountValue, 1000);
+
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`;
+
+        const requestBody = {
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: question }],
+            },
+          ],
+          systemInstruction: {
+            parts: [{ text: systemInstructionText }],
+          },
+        };
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (!response.ok) {
+            let errorMsg = `API Error: ${response.status}`;
+            let errorDetails = "Could not retrieve error details.";
+            try {
+              const errorData = await response.json();
+              if (errorData.error && errorData.error.message) {
+                errorDetails = errorData.error.message;
+              }
+              errorMsg = `${errorMsg} - ${errorDetails}`;
+              if (errorData.error && errorData.error.status) {
+                errorMsg += ` (Status: ${errorData.error.status})`;
+              }
+              // Check for API key specific issues
+              if (
+                errorDetails.toLowerCase().includes("api key not valid") ||
+                errorDetails.toLowerCase().includes("permission denied")
+              ) {
+                errorMsg +=
+                  "<br><strong>Please double-check your API key and ensure it's correctly enabled for the Gemini API in your Google Cloud Console or AI Studio.</strong>";
+              }
+            } catch (parseError) {
+              errorMsg = `${errorMsg} (Could not parse error response: ${response.statusText})`;
+            }
+            throw new Error(errorMsg);
+          }
+
+          const data = await response.json();
+
+          if (
+            data.candidates &&
+            data.candidates.length > 0 &&
+            data.candidates[0].content &&
+            data.candidates[0].content.parts &&
+            data.candidates[0].content.parts.length > 0
+          ) {
+            const answerText = data.candidates[0].content.parts[0].text;
+
+            // Format the response with code highlighting
+            let formattedText = answerText;
+
+            // Simple formatting: wrap code snippets in <code> tags
+            formattedText = formattedText.replace(
+              /(```[\s\S]*?```)|(`[^`]+`)/g,
+              (match) => {
+                if (match.startsWith("```")) {
+                  return `<pre class="bg-dark-code p-4 rounded-lg my-3 overflow-x-auto animate-fade-in"><code class="font-mono text-sm">${match.replace(
+                    /```/g,
+                    ""
+                  )}</code></pre>`;
+                } else {
+                  return `<code class="bg-dark-code text-secondary px-2 py-1 rounded animate-fade-in">${match.replace(
+                    /`/g,
+                    ""
+                  )}</code>`;
+                }
+              }
+            );
+
+            // Convert line breaks to paragraphs for better readability
+            const paragraphs = formattedText.split("\n\n");
+            let htmlOutput = '';
+
+            for (const paragraph of paragraphs) {
+              if (paragraph.trim() !== "") {
+                htmlOutput += `<p class="mb-4 animate-slide-in">${paragraph}</p>`;
+              }
+            }
+
+            outputArea.innerHTML = htmlOutput;
+            responseActions.classList.remove('hidden');
+          } else if (data.promptFeedback && data.promptFeedback.blockReason) {
+            outputArea.innerHTML = `<div class="bg-red-500/10 border-l-4 border-red-500 p-4 rounded text-red-500 mb-4 flex items-center space-x-2 animate-slide-in"><i class="fas fa-ban"></i><span>Blocked due to: ${
+              data.promptFeedback.blockReason
+            }. Details: ${
+              data.promptFeedback.blockReasonMessage || ""
+            }</span></div>`;
+            responseActions.classList.add('hidden');
+          } else {
+            console.warn("Unexpected response structure:", data);
+            outputArea.innerHTML =
+              '<div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded text-yellow-500 mb-4 flex items-center space-x-2 animate-slide-in"><i class="fas fa-exclamation-triangle"></i><span>Received an unexpected response structure from the AI.</span></div>';
+            responseActions.classList.add('hidden');
+          }
+        } catch (error) {
+          console.error("Frontend Error:", error);
+          outputArea.innerHTML = `<div class="bg-red-500/10 border-l-4 border-red-500 p-4 rounded text-red-500 mb-4 flex items-center space-x-2 animate-slide-in"><i class="fas fa-bug"></i><span>Failed to get answer: ${error.message}</span></div>`;
+          responseActions.classList.add('hidden');
+        } finally {
+          askButton.disabled = false;
+          askButton.innerHTML =
+            '<i class="fas fa-paper-plane"></i><span>Ask Coding Instructor</span>';
+          loadingIndicator.classList.add("hidden");
+          outputArea.classList.remove("hidden");
+
+          // Smooth scroll to output
+          outputArea.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+
+      // Allow Enter key (but not Shift+Enter) in textarea to submit
+      questionInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          askButton.click();
+        }
+      });
+
+      // Add some example questions for demonstration
+      setTimeout(() => {
+        outputArea.innerHTML = `
+                <p class="mb-4 animate-slide-in"><strong>Welcome to Coding Instructor AI!</strong> I'm here to help you with any programming questions you have.</p>
+                <p class="mb-4 animate-slide-in">Here's an example of how I can help:</p>
+                <p class="mb-2 animate-slide-in"><strong>Question:</strong> What is a closure in JavaScript?</p>
+                <p class="mb-4 animate-slide-in"><strong>Answer:</strong> A closure is a function that retains access to variables from its outer (enclosing) scope even after the outer function has finished executing. This happens because the inner function maintains a reference to its lexical environment.</p>
+                <p class="mb-2 animate-slide-in">Example:</p>
+                <pre class="bg-dark-code p-4 rounded-lg my-3 overflow-x-auto animate-fade-in"><code class="font-mono text-sm">function outer() {
+  let count = 0;
+  return function inner() {
+    count++;
+    return count;
+  };
+}
+
+const counter = outer();
+console.log(counter()); // 1
+console.log(counter()); // 2
+console.log(counter()); // 3</code></pre>
+                <p class="animate-slide-in">In this example, the inner function maintains access to the count variable even after outer has finished executing.</p>
+                `;
+      }, 2000);
+    </script>
+  </body>
+</html>
+"""
+
+components.html(html_code, height=900, scrolling=True)
